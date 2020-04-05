@@ -1,32 +1,32 @@
 # T3 
 Server Client TicTacToe
 
-Imgui for GUI
-GLFW for window managment
-OpenGl for grapichs. (GLEW to load opengl function pointers)
-GLM for math operations
+Imgui for GUI<br />
+GLFW for window managment<br />
+OpenGl for grapichs. (GLEW to load opengl function pointers)<br />
+GLM for math operations<br />
 
 
 
 ## Visual Studio Setup
 
-#C/C++
-Additional include directories:
-$(SolutionDir)dependencies\include\IMGUI
-$(SolutionDir)dependencies\include
-$(SolutionDir)src\
+------ C/C++ -----<br />
+Additional include directories:<br />
+$(SolutionDir)dependencies\include\IMGUI<br />
+$(SolutionDir)dependencies\include<br />
+$(SolutionDir)src\ <br />
 
 
-#Linker
-Additional library directories: //Using visual studio 2019, change glfw for wanted version
-$(SolutionDir)dependencies\lib\GLEW
-$(SolutionDir)dependencies\lib\GLFW\lib-vc2019
+----- Linker -----<br />
+Additional library directories: //Using visual studio 2019, change glfw for wanted version<br />
+$(SolutionDir)dependencies\lib\GLEW<br />
+$(SolutionDir)dependencies\lib\GLFW\lib-vc2019<br />
 
-Additional dependencies:
-glfw3.lib
-opengl32.lib
-glew32s.lib
+Additional dependencies:<br />
+glfw3.lib<br />
+opengl32.lib<br />
+glew32s.lib<br />
 
-SubSystem: //main() if Console, winMain if Windows
-Console (/SUBSYSTEM:CONSOLE)
-Windows (/SUBSYSTEM:WINDOWS)
+SubSystem: //main() if Console, winMain if Windows<br />
+Console (/SUBSYSTEM:CONSOLE)<br />
+Windows (/SUBSYSTEM:WINDOWS)<br />
