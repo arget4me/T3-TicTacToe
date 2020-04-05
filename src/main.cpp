@@ -15,9 +15,13 @@
 #include <glm/gtc/type_ptr.hpp> //glm::value_ptr
 
 #include "Utils/logfile.h"
+#include "game.h"
 
 #include <cstdlib>
 
+
+#define STB_IMAGE_IMPLEMENTATION
+#include "stb_image.h"
 
 #include "config_file.h"
 
@@ -49,16 +53,7 @@ static void framebuffer_size_callback(GLFWwindow* window, int width, int height)
 
 
 
-bool update()
-{
 
-	return false;
-}
-
-void render()
-{
-
-}
 
 
 
@@ -121,6 +116,8 @@ INT WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance,
 	int frameCount = 0;
 	#endif
 
+	initialize_game();
+
 	while (!glfwWindowShouldClose(window))
 	{
 		#if FPS_TIMED
@@ -147,7 +144,7 @@ INT WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance,
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 		//Update Game here
-		if(update()) break;
+		if(update_game()) break;
 		
 		//Draw
 		ImGui_ImplGlfwGL3_NewFrame();
@@ -159,7 +156,7 @@ INT WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance,
 		
 
 		//Reder game here
-		render();
+		render_game();
 
 		ImGui_ImplGlfwGL3_RenderDrawData(ImGui::GetDrawData());
 
