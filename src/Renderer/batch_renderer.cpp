@@ -7,6 +7,7 @@ namespace t3
 {
 
 	const int BATCH_MAX_SIZE = 1000;
+	float global_z_value = 0.0f;
 
 	typedef struct
 	{
@@ -52,7 +53,7 @@ namespace t3
 		unsigned char* data = stbi_load(image_file_path, &width, &height, &nrChannels, 0);
 		if (data)
 		{
-			glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, data);
+			glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, data);
 			glGenerateMipmap(GL_TEXTURE_2D);
 		}
 		else
@@ -67,6 +68,10 @@ namespace t3
 
 	void initialize_batch_renderer()
 	{
+
+		glEnable(GL_BLEND);
+		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+
 		glGenVertexArrays(1, &vao);
 		glBindVertexArray(vao);
 
@@ -90,6 +95,11 @@ namespace t3
 
 	}
 
+	void set_layer_z(float z_value) 
+	{
+		global_z_value = z_value;
+	}
+
 
 	void submit_sprite(int sprite_offset, int num_sprites_width, float center_x, float center_y, float width, float height)
 	{
@@ -108,16 +118,16 @@ namespace t3
 		float min_v = (float)(sprite_offset / num_sprites_width) / (float)num_sprites_width;
 		float max_v = (float)(sprite_offset / num_sprites_width + 1) / (float)num_sprites_width;
 
-		current_sprite.bottom_left.position = glm::vec3(min_x, min_y, 0);
+		current_sprite.bottom_left.position = glm::vec3(min_x, min_y, global_z_value);
 		current_sprite.bottom_left.uv_coords = glm::vec2(min_u, min_v);
 
-		current_sprite.bottom_right.position = glm::vec3(max_x, min_y, 0);
+		current_sprite.bottom_right.position = glm::vec3(max_x, min_y, global_z_value);
 		current_sprite.bottom_right.uv_coords = glm::vec2(max_u, min_v);
 
-		current_sprite.top_right.position = glm::vec3(max_x, max_y, 0);
+		current_sprite.top_right.position = glm::vec3(max_x, max_y, global_z_value);
 		current_sprite.top_right.uv_coords = glm::vec2(max_u, max_v);
 
-		current_sprite.top_left.position = glm::vec3(min_x, max_y, 0);
+		current_sprite.top_left.position = glm::vec3(min_x, max_y, global_z_value);
 		current_sprite.top_left.uv_coords = glm::vec2(min_u, max_v);
 
 
@@ -145,6 +155,7 @@ namespace t3
 		glDrawElements(GL_TRIANGLES, 6 * current_batch_length, GL_UNSIGNED_INT, 0);
 
 		current_batch_length = 0;
+		set_layer_z(1.0f);
 	}
 
 }

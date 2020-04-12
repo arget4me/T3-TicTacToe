@@ -15,8 +15,10 @@ namespace t3
 	}Vertex;
 
 	GLuint loadTexture(const char* image_file_path, GLuint texture_slot);
-	
+
 	void initialize_batch_renderer();
+	
+	void set_layer_z(float z_value);
 
 	void submit_sprite(int sprite_offset, int num_sprites_width, float center_x, float center_y, float width, float height);
 
