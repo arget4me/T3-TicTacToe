@@ -8,6 +8,7 @@ namespace t3
 
 	const int BATCH_MAX_SIZE = 1000;
 	float global_z_value = 0.0f;
+	float texel_offset_size = 0.0f;
 
 	typedef struct
 	{
@@ -61,7 +62,9 @@ namespace t3
 			DEBUG_LOG("Failed to load texture\n");
 		}
 		stbi_image_free(data);
-		glBindTexture(GL_TEXTURE_2D, 0);
+
+		texel_offset_size = 0.5f / (float)width;//Half the size of a texel
+		//glBindTexture(GL_TEXTURE_2D, 0);
 		return texture;
 	}
 
@@ -113,10 +116,10 @@ namespace t3
 
 		if (num_sprites_width == 0)num_sprites_width = 1;
 		
-		float min_u = (float)(sprite_offset % num_sprites_width) / (float)num_sprites_width;
-		float max_u = (float)(sprite_offset % num_sprites_width + 1) / (float)num_sprites_width;
-		float min_v = (float)(sprite_offset / num_sprites_width) / (float)num_sprites_width;
-		float max_v = (float)(sprite_offset / num_sprites_width + 1) / (float)num_sprites_width;
+		float min_u = (float)(sprite_offset % num_sprites_width) / (float)num_sprites_width + texel_offset_size;
+		float max_u = (float)(sprite_offset % num_sprites_width + 1) / (float)num_sprites_width - texel_offset_size;
+		float min_v = (float)(sprite_offset / num_sprites_width) / (float)num_sprites_width + texel_offset_size;
+		float max_v = (float)(sprite_offset / num_sprites_width + 1) / (float)num_sprites_width - texel_offset_size;
 
 		current_sprite.bottom_left.position = glm::vec3(min_x, min_y, global_z_value);
 		current_sprite.bottom_left.uv_coords = glm::vec2(min_u, min_v);
