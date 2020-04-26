@@ -147,11 +147,11 @@ INT WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance,
 		if(update_game()) break;
 		
 		//Draw
-		ImGui_ImplGlfwGL3_NewFrame();
+		/*ImGui_ImplGlfwGL3_NewFrame();
 		ImGui::Text("Debug Panel:");
 		ImGui::Separator();
 		
-		ImGui::Render();
+		ImGui::Render();*/
 
 		
 
