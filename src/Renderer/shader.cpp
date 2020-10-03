@@ -15,9 +15,6 @@ namespace t3
 
 		const char* vertex_shader_src = vertex_shader_str.c_str();
 		const char* fragment_shader_src = fragment_shader_str.c_str();
-		DEBUG_LOG(vertex_shader_src);
-		DEBUG_LOG(fragment_shader_src);
-
 
 		GLuint vs = glCreateShader(GL_VERTEX_SHADER);
 		glShaderSource(vs, 1, &vertex_shader_src, NULL);
@@ -108,7 +105,7 @@ namespace t3
 		}
 		else
 		{
-			DEBUG_LOG("shader compilation success!\n");
+			//DEBUG_LOG("shader compilation success!\n");
 		}
 	}
 
@@ -133,7 +130,7 @@ namespace t3
 		}
 		else
 		{
-			DEBUG_LOG("Shader program compilation success!\n");
+			//DEBUG_LOG("Shader program compilation success!\n");
 		}
 	}
 

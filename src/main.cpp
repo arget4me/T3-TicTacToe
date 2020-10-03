@@ -16,6 +16,7 @@
 
 #include "Utils/logfile.h"
 #include "game.h"
+#include "Input/Mouse.h"
 
 #include <cstdlib>
 
@@ -30,16 +31,55 @@
 //Globals
 int global_height = 720;
 int global_width = 1280;
+bool keys[4] = { false };
+
+Mouse global_mouse;
 
 static void error_callback(int error, const char* description)
 {
 	std::cerr << description;
 }
 
+void mouse_button_callback(GLFWwindow* window, int button, int action, int mods)
+{
+	glfwGetCursorPos(window, &global_mouse.x, &global_mouse.y);
+
+	if (button == GLFW_MOUSE_BUTTON_LEFT)
+	{
+		global_mouse.left_btn.register_input(action == GLFW_PRESS);
+	}
+	if (button == GLFW_MOUSE_BUTTON_MIDDLE)
+	{
+		global_mouse.middle_btn.register_input(action == GLFW_PRESS);
+	}
+	if (button == GLFW_MOUSE_BUTTON_RIGHT)
+	{
+		global_mouse.right_btn.register_input(action == GLFW_PRESS);
+	}
+}
+
+
+
 static void key_callback(GLFWwindow* window, int key, int scancode, int action, int mods)
 {
 	if ((key == GLFW_KEY_ESCAPE || key == GLFW_KEY_Q) && action == GLFW_PRESS)
 		glfwSetWindowShouldClose(window, GL_TRUE);
+	if (key == GLFW_KEY_1)
+	{
+		keys[0] = (action == GLFW_PRESS);
+	}
+	if (key == GLFW_KEY_2)
+	{
+		keys[1] = (action == GLFW_PRESS);
+	}
+	if (key == GLFW_KEY_3)
+	{
+		keys[2] = (action == GLFW_PRESS);
+	}
+	if (key == GLFW_KEY_4)
+	{
+		keys[3] = (action == GLFW_PRESS);
+	}
 }
 
 static void framebuffer_size_callback(GLFWwindow* window, int width, int height)
@@ -109,6 +149,9 @@ INT WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance,
 
 	ImGui::StyleColorsDark();
 
+	glfwSetKeyCallback(window, key_callback);
+	glfwSetMouseButtonCallback(window, mouse_button_callback);
+
 
 	#if FPS_TIMED
 	int FPS = 0;
@@ -144,17 +187,8 @@ INT WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance,
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 		//Update Game here
-		if(update_game()) break;
+		if(update_game(global_mouse)) break;
 		
-		//Draw
-		/*ImGui_ImplGlfwGL3_NewFrame();
-		ImGui::Text("Debug Panel:");
-		ImGui::Separator();
-		
-		ImGui::Render();*/
-
-		
-
 		//Reder game here
 		render_game();
 

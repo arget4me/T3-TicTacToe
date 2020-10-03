@@ -118,8 +118,8 @@ namespace t3
 		
 		float min_u = (float)(sprite_offset % num_sprites_width) / (float)num_sprites_width + texel_offset_size;
 		float max_u = (float)(sprite_offset % num_sprites_width + 1) / (float)num_sprites_width - texel_offset_size;
-		float min_v = (float)(sprite_offset / num_sprites_width) / (float)num_sprites_width + texel_offset_size;
-		float max_v = (float)(sprite_offset / num_sprites_width + 1) / (float)num_sprites_width - texel_offset_size;
+		float max_v = (float)(sprite_offset / num_sprites_width) / (float)num_sprites_width + texel_offset_size;
+		float min_v = (float)(sprite_offset / num_sprites_width + 1) / (float)num_sprites_width - texel_offset_size;
 
 		current_sprite.bottom_left.position = glm::vec3(min_x, min_y, global_z_value);
 		current_sprite.bottom_left.uv_coords = glm::vec2(min_u, min_v);
