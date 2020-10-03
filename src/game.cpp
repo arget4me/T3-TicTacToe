@@ -181,17 +181,76 @@ void initialize_game()
 	t3::register_receive_callback(&server_receive_callback);
 }
 
+PlayerTurn get_player_from_tilestate(TileState state)
+{
+	if (state == TileState::O_TILE)
+		return PlayerTurn::O_PLAYER;
+
+
+	return PlayerTurn::X_PLAYER;
+}
+
+bool check_win_condition_row(int row, TileState state)
+{
+	for (int i = 0; i < 3; i++)
+	{
+		if (state != global_game_state.get_tile_state(i + row * 3))
+			return false;
+	}
+	return true;
+}
+
+bool check_win_condition_col(int col, TileState state)
+{
+	for (int i = 0; i < 3; i++)
+	{
+		if (state != global_game_state.get_tile_state(col + i * 3))
+			return false;
+	}
+	return true;
+}
+
+bool check_win_condition_diagonal(bool top_left, TileState state)
+{
+	int start_x = 0;
+	int direction = 1;
+	if (!top_left)
+	{
+		start_x = 2;
+		direction = -1;
+	}
+
+	for (int i = 0; i < 3; i++)
+	{
+		if (state != global_game_state.get_tile_state((start_x + direction * i) + i * 3))
+			return false;
+	}
+	return true;
+}
+
+void update_win_condition(int tile_nr)
+{
+	TileState state = global_game_state.get_tile_state(tile_nr);
+	int dx = tile_nr % 3;
+	int dy = tile_nr / 3;
+	bool row = check_win_condition_row(dy, state);
+	bool col = check_win_condition_col(dx, state);
+	bool diagonal_1 = check_win_condition_diagonal(false, state);
+	bool diagonal_2 = check_win_condition_diagonal(true, state);
+
+	if (row || col || diagonal_1 || diagonal_2)
+	{
+		show_winner = true;
+		winner = get_player_from_tilestate(state);
+	}
+}
+
 bool update_game(Mouse& mouse)
 {
 	if (mouse.middle_btn.get_click())
 	{
-		show_winner = true;
-		winner = PlayerTurn::O_PLAYER;
-	}
-	if (mouse.right_btn.get_click())
-	{
-		show_winner = true;
-		winner = PlayerTurn::X_PLAYER;
+		global_game_state = t3GameState();
+		show_winner = false;
 	}
 
 	if (mouse.left_btn.get_click())
@@ -213,11 +272,13 @@ bool update_game(Mouse& mouse)
 					{
 						global_game_state.set_tile_state(tile_nr, TileState::O_TILE);
 						global_game_state.set_player_turn(PlayerTurn::X_PLAYER);
+						update_win_condition(tile_nr);
 					}
 					else if (global_game_state.get_player_turn() == PlayerTurn::X_PLAYER)
 					{
 						global_game_state.set_tile_state(tile_nr, TileState::X_TILE);
 						global_game_state.set_player_turn(PlayerTurn::O_PLAYER);
+						update_win_condition(tile_nr);
 					}
 				}
 			}
