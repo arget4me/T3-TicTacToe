@@ -166,7 +166,7 @@ bool update_game(Mouse& mouse)
 		show_winner = true;
 		winner = PlayerTurn::O_PLAYER;
 	}
-	if (mouse.middle_btn.get_click())
+	if (mouse.right_btn.get_click())
 	{
 		show_winner = true;
 		winner = PlayerTurn::X_PLAYER;
@@ -245,13 +245,13 @@ void render_game()
 	if (show_winner)
 	{
 		t3::set_layer_z(1.0f);
-		t3::submit_sprite(3, 2, tile_size, tile_size, tile_size, tile_size);
+		t3::submit_sprite(3, 2, tile_size, position[1]*2 - tile_size, tile_size, tile_size);
 		if (winner == PlayerTurn::O_PLAYER)
 		{
-			t3::submit_sprite(2, 2, tile_size * 2, tile_size, tile_size, tile_size);
+			t3::submit_sprite(2, 2, tile_size * 2, position[1] * 2 - tile_size, tile_size, tile_size);
 		}else if (winner == PlayerTurn::X_PLAYER)
 		{
-			t3::submit_sprite(1, 2, tile_size * 2, tile_size, tile_size, tile_size);
+			t3::submit_sprite(1, 2, tile_size * 2, position[1] * 2 - tile_size, tile_size, tile_size);
 		}
 	}
 
