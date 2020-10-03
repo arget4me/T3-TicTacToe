@@ -8,6 +8,7 @@
 #include "imgui.h"
 #include "imgui_impl_glfw_gl3.h"
 #include "Utils/logfile.h"
+#include "server/t3_server.h"
 
 
 struct t3GameState global_game_state;
@@ -123,6 +124,18 @@ void t3GameState::set_player_turn(PlayerTurn state)
 	}
 }
 
+
+
+const bool t3GameState::check_place_piece_on_tile(PlayerTurn player, int tile_nr) {
+	if (global_game_state.get_player_turn() == player)
+	{
+		if (global_game_state.get_tile_state(tile_nr) == TileState::EMPTY_TILE) {
+			return true;
+		}
+	}
+	return false;
+}
+
 void t3GameState::set_tile_state(int tile_nr, TileState state)
 {
 	if (tile_nr >= 0 && tile_nr < 9)
@@ -151,12 +164,21 @@ void t3GameState::set_tile_state(int tile_nr, TileState state)
 	}
 }
 
+void server_receive_callback(char* data, int size) {
+	//TODO:
+}
+
+
+void client_receive_callback(char* data, int size) {
+	//TODO:
+}
 
 void initialize_game()
 {
 	p = t3::compileShader("data/vertex.glsl", "data/fragment.glsl");
 	t3::initialize_batch_renderer();
 	texture = t3::loadTexture("data/spritesheet.png", GL_TEXTURE0);
+	t3::register_receive_callback(&server_receive_callback);
 }
 
 bool update_game(Mouse& mouse)
@@ -186,13 +208,13 @@ bool update_game(Mouse& mouse)
 			if (tile_x < 3 && tile_y < 3)
 			{
 				int tile_nr = tile_x + tile_y * 3;
-				if (global_game_state.get_tile_state(tile_nr) == TileState::EMPTY_TILE)
-				{
+				if (global_game_state.check_place_piece_on_tile(global_game_state.get_player_turn(), tile_nr)) {
 					if (global_game_state.get_player_turn() == PlayerTurn::O_PLAYER)
 					{
 						global_game_state.set_tile_state(tile_nr, TileState::O_TILE);
 						global_game_state.set_player_turn(PlayerTurn::X_PLAYER);
-					}else if (global_game_state.get_player_turn() == PlayerTurn::X_PLAYER)
+					}
+					else if (global_game_state.get_player_turn() == PlayerTurn::X_PLAYER)
 					{
 						global_game_state.set_tile_state(tile_nr, TileState::X_TILE);
 						global_game_state.set_player_turn(PlayerTurn::O_PLAYER);
