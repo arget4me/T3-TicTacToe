@@ -43,12 +43,16 @@ struct t3GameState
 	const TileState get_tile_state(int tile_nr) const;
 	const PlayerTurn get_player_turn() const;
 
+
+	const bool check_place_piece_on_tile(PlayerTurn player, int tile);
+
 	void set_tile_state(int tile_nr, TileState state);
 	void set_player_turn(PlayerTurn state);
 
 };
 
-
+void server_receive_callback(char* data, int size);
+void client_receive_callback(char* data, int size);
 void initialize_game();
 bool update_game(Mouse& mouse);
 void render_game();
