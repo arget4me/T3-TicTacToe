@@ -342,17 +342,17 @@ void render_game()
 		for (int x = 0; x < 3; x++)
 		{
 			t3::set_layer_z(position[2]);
-			t3::submit_sprite(0, 2, position[0] + tile_size * (x - 1), position[1] + tile_size * (1 - y), tile_size, tile_size);
+			t3::submit_sprite(0, 2, position[0] + tile_size * (x - 1), position[1] + tile_size * (y - 1), tile_size, tile_size);
 			t3::set_layer_z(2.0f);
 
 			TileState state = global_game_state.get_tile_state(x + y * 3);
 			if (state == TileState::X_TILE)
 			{
-				t3::submit_sprite(1, 2, position[0] + tile_size * (x - 1), position[1] + tile_size * (1 - y), tile_size, tile_size);
+				t3::submit_sprite(1, 2, position[0] + tile_size * (x - 1), position[1] + tile_size * (y - 1), tile_size, tile_size);
 			}
 			else if (state == TileState::O_TILE)
 			{
-				t3::submit_sprite(2, 2, position[0] + tile_size * (x - 1), position[1] + tile_size * (1 - y), tile_size, tile_size);
+				t3::submit_sprite(2, 2, position[0] + tile_size * (x - 1), position[1] + tile_size * (y - 1), tile_size, tile_size);
 			}
 		}
 	}
@@ -360,13 +360,13 @@ void render_game()
 	if (show_winner)
 	{
 		t3::set_layer_z(1.0f);
-		t3::submit_sprite(3, 2, tile_size, position[1]*2 - tile_size, tile_size, tile_size);
+		t3::submit_sprite(3, 2, tile_size, tile_size, tile_size, tile_size);
 		if (winner == PlayerTurn::O_PLAYER)
 		{
-			t3::submit_sprite(2, 2, tile_size * 2, position[1] * 2 - tile_size, tile_size, tile_size);
+			t3::submit_sprite(2, 2, tile_size * 2, tile_size, tile_size, tile_size);
 		}else if (winner == PlayerTurn::X_PLAYER)
 		{
-			t3::submit_sprite(1, 2, tile_size * 2, position[1] * 2 - tile_size, tile_size, tile_size);
+			t3::submit_sprite(1, 2, tile_size * 2, tile_size, tile_size, tile_size);
 		}
 	}
 

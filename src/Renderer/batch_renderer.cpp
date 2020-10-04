@@ -3,6 +3,7 @@
 #include "stb_image.h"
 #include "Utils/logfile.h"
 
+//@TODO: Maybe don't use this hack with a global variable
 extern int global_height;
 
 namespace t3
