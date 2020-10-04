@@ -29,7 +29,7 @@
 
 
 //Globals
-int global_height = 720;
+extern int global_height = 720;
 int global_width = 1280;
 bool keys[4] = { false };
 

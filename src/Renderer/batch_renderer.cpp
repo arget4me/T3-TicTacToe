@@ -3,6 +3,8 @@
 #include "stb_image.h"
 #include "Utils/logfile.h"
 
+extern int global_height;
+
 namespace t3
 {
 
@@ -104,8 +106,10 @@ namespace t3
 	}
 
 
+
 	void submit_sprite(int sprite_offset, int num_sprites_width, float center_x, float center_y, float width, float height)
 	{
+		center_y = (float)global_height - center_y;
 		SpriteQuad& current_sprite = sprite_batch[current_batch_length];
 
 		float min_x = center_x - width/2;

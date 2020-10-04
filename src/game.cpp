@@ -9,7 +9,7 @@
 #include "imgui_impl_glfw_gl3.h"
 #include "Utils/logfile.h"
 #include "server/t3_server.h"
-
+#include "Menu/Button.h"
 
 struct t3GameState global_game_state;
 
@@ -21,6 +21,8 @@ float position[3] = { 1280.0f / 2, 720.0f / 2, 10.0f };
 float tile_size = 720.0f / 4.0f;
 bool show_winner = false;
 PlayerTurn winner = PlayerTurn::O_PLAYER;
+t3::ImageButton start_host_btn;
+t3::ImageButton start_client_btn;
 
 t3GameState::t3GameState() :data_buffer {0}
 {
@@ -173,12 +175,38 @@ void client_receive_callback(char* data, int size) {
 	//TODO:
 }
 
+void btn_callback(float mx, float my)
+{
+	DEBUG_LOG("Start host\n");
+}
+
+void btn2_callback(float mx, float my)
+{
+	DEBUG_LOG("Start client\n");
+}
+
 void initialize_game()
 {
 	p = t3::compileShader("data/vertex.glsl", "data/fragment.glsl");
 	t3::initialize_batch_renderer();
 	texture = t3::loadTexture("data/spritesheet.png", GL_TEXTURE0);
 	t3::register_receive_callback(&server_receive_callback);
+
+
+	start_host_btn.x = position[0] * 2.0f - tile_size;
+	start_host_btn.y = position[1]* 2 / 3.0f * 1.0f;
+	start_host_btn.width = tile_size;
+	start_host_btn.height = tile_size;
+	start_host_btn.sprite = { 0, 2 };
+	start_host_btn.button_callback = &btn_callback;
+
+	
+	start_client_btn.x = position[0] * 2.0f - tile_size;
+	start_client_btn.y = position[1] * 2 / 3.0f * 2.0f;
+	start_client_btn.width = tile_size;
+	start_client_btn.height = tile_size;
+	start_client_btn.sprite = { 0, 2 };
+	start_client_btn.button_callback = &btn2_callback;
 }
 
 PlayerTurn get_player_from_tilestate(TileState state)
@@ -245,8 +273,12 @@ void update_win_condition(int tile_nr)
 	}
 }
 
+
+
 bool update_game(Mouse& mouse)
 {
+	t3::update_button(start_host_btn, mouse);
+	t3::update_button(start_client_btn, mouse);
 	if (mouse.middle_btn.get_click())
 	{
 		global_game_state = t3GameState();
@@ -337,6 +369,10 @@ void render_game()
 			t3::submit_sprite(1, 2, tile_size * 2, position[1] * 2 - tile_size, tile_size, tile_size);
 		}
 	}
+
+	t3::set_layer_z(1.0f);
+	t3::draw_button(start_host_btn);
+	t3::draw_button(start_client_btn);
 
 
 	t3::render_batch();

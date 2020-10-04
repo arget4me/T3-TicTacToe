@@ -14,6 +14,11 @@ namespace t3
 		glm::vec2 uv_coords;
 	}Vertex;
 
+	typedef struct {
+		int sprite_offset;
+		int num_sprites_width;
+	}Sprite;
+
 	GLuint loadTexture(const char* image_file_path, GLuint texture_slot);
 
 	void initialize_batch_renderer();
