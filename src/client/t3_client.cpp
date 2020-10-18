@@ -25,6 +25,9 @@ const char *serverAddress = "217.215.208.19";
 extern char sendbuf[3];
 static bool next = false;
 
+static int recvbuflen = DEFAULT_BUFLEN;
+static char recvbuf[DEFAULT_BUFLEN];
+
 int t3::init_client(void)
 {
 	WSADATA wsaData;
@@ -119,7 +122,6 @@ int t3::init_client(void)
 			std::this_thread::sleep_for(timespan);
 			// Send an initial buffer
 			iResult = send(ConnectSocket, sendbuf, (int)sizeof(sendbuf), 0);
-			printf("Bytes sent: %d | %04X %04X %04X\n", iResult, sendbuf[0], sendbuf[1], sendbuf[2]);
 			if (iResult == SOCKET_ERROR) {
 				printf("send failed with error: %d\n", WSAGetLastError());
 				closesocket(ConnectSocket);
@@ -127,8 +129,7 @@ int t3::init_client(void)
 				char p = getchar(); //just to stop prompt from closing
 				return 1;
 			}
-
-			printf("Bytes Sent: %ld\n", iResult);
+			printf("Bytes sent: %d | %04X %04X %04X\n", iResult, sendbuf[0], sendbuf[1], sendbuf[2]);
 		}
 	};
 
@@ -142,8 +143,7 @@ int t3::init_client(void)
 	auto receiving_thread = [ConnectSocket]() {
 		int iResult;
 		// Wait for response
-		int recvbuflen = DEFAULT_BUFLEN;
-		char recvbuf[DEFAULT_BUFLEN];
+		
 		
 		do {
 			std::chrono::milliseconds timespan(16);

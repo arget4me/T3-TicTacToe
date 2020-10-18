@@ -26,6 +26,9 @@ static bool active = false;
 char sendbuf[3] = { 0 };
 static bool next = true;
 
+static int recvbuflen = DEFAULT_BUFLEN;
+static char recvbuf[DEFAULT_BUFLEN];
+
 int t3::init_server(void) //Start on own thread
 {
 	if (active)return -1;
@@ -132,7 +135,6 @@ int t3::init_server(void) //Start on own thread
 				std::this_thread::sleep_for(timespan);
 				// Send an initial buffer
 				iResult = send(ClientSocket, sendbuf, (int)sizeof(sendbuf), 0);
-				printf("Bytes sent: %d | %04X %04X %04X\n", iResult, sendbuf[0], sendbuf[1], sendbuf[2]);
 				if (iResult == SOCKET_ERROR) {
 					printf("send failed with error: %d\n", WSAGetLastError());
 					closesocket(ClientSocket);
@@ -140,8 +142,7 @@ int t3::init_server(void) //Start on own thread
 					char p = getchar(); //just to stop prompt from closing
 					return 1;
 				}
-
-				printf("Bytes Sent: %ld\n", iResult);
+				printf("Bytes sent: %d | %04X %04X %04X\n", iResult, sendbuf[0], sendbuf[1], sendbuf[2]);
 			}
 		};
 
@@ -155,8 +156,7 @@ int t3::init_server(void) //Start on own thread
 		auto receiving_thread = [ClientSocket]() {
 			int iResult;
 			// Wait for response
-			int recvbuflen = DEFAULT_BUFLEN;
-			char recvbuf[DEFAULT_BUFLEN];
+
 
 			do {
 				std::chrono::milliseconds timespan(16);
@@ -210,7 +210,6 @@ void t3::sendData(char* data, int size)
 	for (int i = 0; i < 3; i++) {
 		sendbuf[i] = data[i];
 	}
-
 }
 
 namespace t3 { void(*receive_callback)(char*, int); };
