@@ -95,6 +95,7 @@ int t3::init_server(void) //Start on own thread
 			char p = getchar(); //just to stop prompt from closing
 			return 1;
 		}
+		printf("Listening to socket...\n");
 
 		// Accept a client socket
 		ClientSocket = accept(ListenSocket, NULL, NULL);
@@ -105,6 +106,7 @@ int t3::init_server(void) //Start on own thread
 			char p = getchar(); //just to stop prompt from closing
 			return 1;
 		}
+		printf("Accepted client!\n");
 
 		// No longer need server socket
 		closesocket(ListenSocket);

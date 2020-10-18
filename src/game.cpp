@@ -9,6 +9,7 @@
 #include "imgui_impl_glfw_gl3.h"
 #include "Utils/logfile.h"
 #include "server/t3_server.h"
+#include "client/t3_client.h"
 #include "Menu/Button.h"
 #include <thread>
 
@@ -188,16 +189,16 @@ void receive_callback(char* data, int size)
 
 void btn_callback(float mx, float my)
 {
-	select_server_client = false;
+	//select_server_client = false;
 	DEBUG_LOG("Start server\n");
 	server_thread = new std::thread(t3::init_server);
 }
 
 void btn2_callback(float mx, float my)
 {
-	select_server_client = false;
+	//select_server_client = false;
 	DEBUG_LOG("Start client\n");
-	//server_thread = new std::thread(t3::init_client);
+	server_thread = new std::thread(t3::init_client);
 	
 }
 

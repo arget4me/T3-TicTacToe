@@ -19,6 +19,7 @@ void handleMessage(SOCKET ConnectSocket, std::string recvbuf, int recvbuflen); /
 #define DEFAULT_BUFLEN 512
 #define DEFAULT_PORT "27015"
 const char *serverAddress = "98.128.228.181";
+//const char *serverAddress = "127.0.0.1";
 
 char sendbuf[3] = {0};
 
