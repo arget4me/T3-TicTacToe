@@ -140,7 +140,6 @@ int t3::init_client(void)
 			iResult = recv(ConnectSocket, recvbuf, recvbuflen, 0);
 			if (iResult > 0) {
 				printf("Bytes received: %d\n", iResult);
-				printf("Buffer received: %s\n", recvbuf);
 				// handle message
 				handleMessage(ConnectSocket, recvbuf, recvbuflen);
 			}

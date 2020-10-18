@@ -151,7 +151,6 @@ int t3::init_server(void) //Start on own thread
 				iResult = recv(ClientSocket, recvbuf, recvbuflen, 0);
 				if (iResult > 0) {
 					printf("Bytes received: %d\n", iResult);
-					printf("Buffer received: %s\n", recvbuf);
 					// handle message
 					handleMessage(ClientSocket, recvbuf, recvbuflen);
 				}
