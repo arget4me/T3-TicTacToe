@@ -24,6 +24,7 @@ void handleMessage(SOCKET ConnectSocket, std::string recvbuf, int recvbuflen); /
 static bool active = false;
 
 char sendbuf[3] = { 0 };
+static bool next = true;
 
 int t3::init_server(void) //Start on own thread
 {
@@ -125,6 +126,8 @@ int t3::init_server(void) //Start on own thread
 
 			printf("Sendbuf address %p\n", sendbuf);
 			while (1) {
+				if (!next)continue;
+				next = false;
 				std::chrono::milliseconds timespan(16);
 				std::this_thread::sleep_for(timespan);
 				// Send an initial buffer
@@ -214,6 +217,7 @@ namespace t3 { void(*receive_callback)(char*, int); };
 void handleMessage(SOCKET ConnectSocket, std::string recvbuf, int recvbuflen)
 {
 	t3::receive_callback((char*)&recvbuf, recvbuflen);
+	next = true;
 }
 
 

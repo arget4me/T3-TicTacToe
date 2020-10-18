@@ -172,6 +172,7 @@ void t3GameState::set_tile_state(int tile_nr, TileState state)
 
 void receive_callback(char* data, int size)
 {
+	if (size > 3)return;
 	//TODO: Use QUEUE??
 
 	DEBUG_LOG("message received! Size: [" << size << "]\n");

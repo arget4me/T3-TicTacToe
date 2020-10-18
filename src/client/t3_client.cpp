@@ -23,6 +23,7 @@ const char *serverAddress = "217.215.208.19";
 //const char *serverAddress = "127.0.0.1";
 
 extern char sendbuf[3];
+static bool next = false;
 
 int t3::init_client(void)
 {
@@ -112,6 +113,8 @@ int t3::init_client(void)
 		int iResult;
 		printf("Sendbuf address %p\n", sendbuf);
 		while (1) {
+			if (!next)continue;
+			next = false;
 			std::chrono::milliseconds timespan(16);
 			std::this_thread::sleep_for(timespan);
 			// Send an initial buffer
@@ -192,6 +195,8 @@ static void handleMessage(SOCKET ConnectSocket, std::string recvbuf, int recvbuf
 	std::cout << "Recieved this message: " << recvbuf << std::endl;
 
 	t3::receive_callback((char*)&recvbuf, recvbuflen);
+
+	next = true;
 }
 
 /*
