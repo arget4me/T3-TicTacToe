@@ -175,15 +175,14 @@ void t3::sendData(char* data, int size)
 
 }
 
-void(*receive_callback)(char*, int);
+namespace t3 { void(*receive_callback)(char*, int); };
 
 void handleMessage(SOCKET ConnectSocket, std::string recvbuf, int recvbuflen) {
-	std::cout << "Recieved this message: " << recvbuf << std::endl;
 
-	receive_callback((char*)&recvbuf, recvbuflen);
+	t3::receive_callback((char*)&recvbuf, recvbuflen);
 }
 
 
 void t3::register_receive_callback(void(*callback)(char*, int)) {
-	receive_callback = callback;
+	t3::receive_callback = callback;
 }
