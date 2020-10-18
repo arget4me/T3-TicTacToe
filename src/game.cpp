@@ -16,15 +16,16 @@ struct t3GameState global_game_state;
 
 
 //globals
-t3::ShaderProgram p;
-unsigned int texture;
-float position[3] = { 1280.0f / 2, 720.0f / 2, 10.0f };
-float tile_size = 720.0f / 4.0f;
-bool show_winner = false;
-PlayerTurn winner = PlayerTurn::O_PLAYER;
-t3::ImageButton start_host_btn;
-t3::ImageButton start_client_btn;
+static t3::ShaderProgram p;
+static unsigned int texture;
+static float position[3] = { 1280.0f / 2, 720.0f / 2, 10.0f };
+static float tile_size = 720.0f / 4.0f;
+static bool show_winner = false;
+static PlayerTurn winner = PlayerTurn::O_PLAYER;
+static t3::ImageButton start_host_btn;
+static t3::ImageButton start_client_btn;
 static std::thread* server_thread;
+static bool select_server_client = true;
 
 t3GameState::t3GameState() :data_buffer {0}
 {
@@ -168,7 +169,8 @@ void t3GameState::set_tile_state(int tile_nr, TileState state)
 	}
 }
 
-void receive_callback(char* data, int size) {
+void receive_callback(char* data, int size)
+{
 	//TODO: Use QUEUE??
 
 	DEBUG_LOG("message received! Size: [" << size << "]\n");
@@ -186,13 +188,16 @@ void receive_callback(char* data, int size) {
 
 void btn_callback(float mx, float my)
 {
+	select_server_client = false;
 	DEBUG_LOG("Start server\n");
 	server_thread = new std::thread(t3::init_server);
 }
 
 void btn2_callback(float mx, float my)
 {
+	select_server_client = false;
 	DEBUG_LOG("Start client\n");
+	//server_thread = new std::thread(t3::init_client);
 	
 }
 
@@ -288,8 +293,12 @@ void update_win_condition(int tile_nr)
 
 bool update_game(Mouse& mouse)
 {
-	t3::update_button(start_host_btn, mouse);
-	t3::update_button(start_client_btn, mouse);
+
+	if (select_server_client)
+	{
+		t3::update_button(start_host_btn, mouse);
+		t3::update_button(start_client_btn, mouse);
+	}
 	if (mouse.middle_btn.get_click())
 	{
 		global_game_state = t3GameState();
@@ -384,10 +393,12 @@ void render_game()
 		}
 	}
 
-	t3::set_layer_z(1.0f);
-	t3::draw_button(start_host_btn);
-	t3::draw_button(start_client_btn);
-
+	if (select_server_client)
+	{
+		t3::set_layer_z(1.0f);
+		t3::draw_button(start_host_btn);
+		t3::draw_button(start_client_btn);
+	}
 
 	t3::render_batch();
 }
