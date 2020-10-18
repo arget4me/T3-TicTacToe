@@ -16,7 +16,7 @@
 // Need to link with Ws2_32.lib
 #pragma comment (lib, "Ws2_32.lib")
 // #pragma comment (lib, "Mswsock.lib")
-void handleMessage(SOCKET ConnectSocket, std::string recvbuf, int recvbuflen); // handle messages received from TCP-packets
+static void handleMessage(SOCKET ConnectSocket, char* recvbuf, int recvbuflen); // handle messages received from TCP-packets
 
 #define DEFAULT_BUFLEN 3
 #define DEFAULT_PORT "27015"
@@ -212,9 +212,9 @@ void t3::sendData(char* data, int size)
 
 namespace t3 { void(*receive_callback)(char*, int); };
 
-void handleMessage(SOCKET ConnectSocket, std::string recvbuf, int recvbuflen)
+static void handleMessage(SOCKET ConnectSocket, char* recvbuf, int recvbuflen)
 {
-	t3::receive_callback((char*)&recvbuf, recvbuflen);
+	t3::receive_callback(recvbuf, recvbuflen);
 	next = true;
 }
 
