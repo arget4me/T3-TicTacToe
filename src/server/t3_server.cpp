@@ -21,7 +21,7 @@ void handleMessage(SOCKET ConnectSocket, std::string recvbuf, int recvbuflen); /
 
 static bool active = false;
 
-static char sendbuf[3] = { 0 };
+char sendbuf[3] = { 0 };
 
 int t3::init_server(void) //Start on own thread
 {
@@ -195,7 +195,9 @@ int t3::init_server(void) //Start on own thread
 void t3::sendData(char* data, int size)
 {
 	//server send stuff
-
+	for (int i = 0; i < 3; i++) {
+		sendbuf[i] = data[i];
+	}
 
 }
 

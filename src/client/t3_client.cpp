@@ -21,7 +21,7 @@ void handleMessage(SOCKET ConnectSocket, std::string recvbuf, int recvbuflen); /
 const char *serverAddress = "217.215.208.19";
 //const char *serverAddress = "127.0.0.1";
 
-static char sendbuf[3] = {0};
+extern char sendbuf[3];
 
 int t3::init_client(void)
 {
