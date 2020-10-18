@@ -119,6 +119,7 @@ int t3::init_client(void)
 			std::this_thread::sleep_for(timespan);
 			// Send an initial buffer
 			iResult = send(ConnectSocket, sendbuf, (int)sizeof(sendbuf), 0);
+			printf("Bytes sent: %d | %04X %04X %04X\n", iResult, sendbuf[0], sendbuf[1], sendbuf[2]);
 			if (iResult == SOCKET_ERROR) {
 				printf("send failed with error: %d\n", WSAGetLastError());
 				closesocket(ConnectSocket);
