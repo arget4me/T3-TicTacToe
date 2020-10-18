@@ -10,6 +10,7 @@
 #include "Utils/logfile.h"
 #include "server/t3_server.h"
 #include "Menu/Button.h"
+#include <thread>
 
 struct t3GameState global_game_state;
 
@@ -23,6 +24,7 @@ bool show_winner = false;
 PlayerTurn winner = PlayerTurn::O_PLAYER;
 t3::ImageButton start_host_btn;
 t3::ImageButton start_client_btn;
+static std::thread* server_thread;
 
 t3GameState::t3GameState() :data_buffer {0}
 {
@@ -166,23 +168,32 @@ void t3GameState::set_tile_state(int tile_nr, TileState state)
 	}
 }
 
-void server_receive_callback(char* data, int size) {
-	//TODO:
+void receive_callback(char* data, int size) {
+	//TODO: Use QUEUE??
+
+	DEBUG_LOG("message received! Size: [" << size << "]\n");
+
+	int state_buffer_size = global_game_state.get_buffer_size();
+	if (size < state_buffer_size) state_buffer_size = size;
+
+	//COPY data...
+	for (int i = 0; i < state_buffer_size; i++)
+	{
+		global_game_state.data_buffer[i] = data[i];
+	}
 }
 
-
-void client_receive_callback(char* data, int size) {
-	//TODO:
-}
 
 void btn_callback(float mx, float my)
 {
-	DEBUG_LOG("Start host\n");
+	DEBUG_LOG("Start server\n");
+	server_thread = new std::thread(t3::init_server);
 }
 
 void btn2_callback(float mx, float my)
 {
 	DEBUG_LOG("Start client\n");
+	
 }
 
 void initialize_game()
@@ -190,7 +201,7 @@ void initialize_game()
 	p = t3::compileShader("data/vertex.glsl", "data/fragment.glsl");
 	t3::initialize_batch_renderer();
 	texture = t3::loadTexture("data/spritesheet.png", GL_TEXTURE0);
-	t3::register_receive_callback(&server_receive_callback);
+	t3::register_receive_callback(&receive_callback);
 
 
 	start_host_btn.x = position[0] * 2.0f - tile_size;
@@ -316,6 +327,9 @@ bool update_game(Mouse& mouse)
 			}
 		}
 	}
+
+	t3::sendData(global_game_state.data_buffer, global_game_state.get_buffer_size());
+
 	return false;
 }
 

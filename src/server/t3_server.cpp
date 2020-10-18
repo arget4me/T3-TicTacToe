@@ -18,8 +18,13 @@ void handleMessage(SOCKET ConnectSocket, std::string recvbuf, int recvbuflen); /
 #define DEFAULT_BUFLEN 512
 #define DEFAULT_PORT "27015"
 
-int init_server(void)
+bool active = false;
+
+int t3::init_server(void) //Start on own thread
 {
+	if (active)return -1;
+	active = true;
+
 	WSADATA wsaData;
 	int iResult;
 
@@ -161,6 +166,13 @@ int init_server(void)
 
 
 	return 0;
+}
+
+void t3::sendData(char* data, int size)
+{
+	//server send stuff
+
+
 }
 
 void(*receive_callback)(char*, int);

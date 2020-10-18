@@ -43,6 +43,8 @@ struct t3GameState
 	const TileState get_tile_state(int tile_nr) const;
 	const PlayerTurn get_player_turn() const;
 
+	const inline int get_buffer_size() const { return 3; }
+
 
 	const bool check_place_piece_on_tile(PlayerTurn player, int tile);
 
