@@ -9,6 +9,7 @@
 #include <stdio.h>
 #include <iostream>
 #include <string>
+#include <thread>
 #include "t3_server.h"
 // Need to link with Ws2_32.lib
 #pragma comment (lib, "Ws2_32.lib")
@@ -18,7 +19,9 @@ void handleMessage(SOCKET ConnectSocket, std::string recvbuf, int recvbuflen); /
 #define DEFAULT_BUFLEN 512
 #define DEFAULT_PORT "27015"
 
-bool active = false;
+static bool active = false;
+
+static char sendbuf[3] = { 0 };
 
 int t3::init_server(void) //Start on own thread
 {
@@ -111,42 +114,61 @@ int t3::init_server(void) //Start on own thread
 		// No longer need server socket
 		closesocket(ListenSocket);
 
-		// Receive until the peer shuts down the connection
-		do {
-
-			iResult = recv(ClientSocket, recvbuf, recvbuflen, 0);
-			if (iResult > 0) {
-				//printf("Bytes received: %d\n", iResult);
-				//printf("Buffer received: %s\n", recvbuf);
-				handleMessage(ClientSocket, recvbuf, recvbuflen);
 
 
-				// Echo the buffer back to the sender
-				const char *sendAnswer = "I got your message, Bye bye!";
-				iSendResult = send(ClientSocket, sendAnswer, (int)strlen(sendAnswer) + 1, 0);
-				if (iSendResult == SOCKET_ERROR) {
+		// Define a lamda expression 
+		auto sending_thread = [ClientSocket]() {
+			int iResult;
+			while (1) {
+				// Send an initial buffer
+				iResult = send(ClientSocket, sendbuf, (int)sizeof(sendbuf), 0);
+				if (iResult == SOCKET_ERROR) {
 					printf("send failed with error: %d\n", WSAGetLastError());
 					closesocket(ClientSocket);
 					WSACleanup();
 					char p = getchar(); //just to stop prompt from closing
 					return 1;
 				}
-				printf("Bytes sent: %d\n", iSendResult);
+
+				printf("Bytes Sent: %ld\n", iResult);
 			}
-			else if (iResult == 0)
-				//printf("Connection closing...\n");
-				printf("Recieved all data!\n");
-			else {
-				printf("recv failed with error: %d\n", WSAGetLastError());
-				closesocket(ClientSocket);
-				WSACleanup();
-				char p = getchar(); //just to stop prompt from closing
-				return 1;
-			}
+		};
 
-		} while (iResult > 0);
+		// Pass sending_thread and its parameters to thread  
+		// object constructor as 
+		std::thread thread_sending(sending_thread);
 
 
+
+		// Define a lamda expression 
+		auto receiving_thread = [ClientSocket]() {
+			int iResult;
+			// Wait for response
+			int recvbuflen = DEFAULT_BUFLEN;
+			char recvbuf[DEFAULT_BUFLEN];
+
+			do {
+				iResult = recv(ClientSocket, recvbuf, recvbuflen, 0);
+				if (iResult > 0) {
+					printf("Bytes received: %d\n", iResult);
+					printf("Buffer received: %s\n", recvbuf);
+					// handle message
+					handleMessage(ClientSocket, recvbuf, recvbuflen);
+				}
+				else if (iResult == 0)
+					printf("Connection closed\n");
+				else
+					printf("recv failed with error: %d\n", WSAGetLastError());
+
+			} while (iResult > 0);
+
+		};
+
+		// Pass receiving_thread and its parameters to thread  
+		// object constructor as 
+		std::thread thread_receiver(receiving_thread);
+
+		thread_receiver.join();
 
 		// shutdown the connection since we're done
 		iResult = shutdown(ClientSocket, SD_SEND);

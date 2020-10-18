@@ -18,10 +18,10 @@ void handleMessage(SOCKET ConnectSocket, std::string recvbuf, int recvbuflen); /
 
 #define DEFAULT_BUFLEN 512
 #define DEFAULT_PORT "27015"
-const char *serverAddress = "98.128.228.181";
+const char *serverAddress = "217.215.208.19";
 //const char *serverAddress = "127.0.0.1";
 
-char sendbuf[3] = {0};
+static char sendbuf[3] = {0};
 
 int t3::init_client(void)
 {
@@ -125,7 +125,7 @@ int t3::init_client(void)
 
 	// Pass sending_thread and its parameters to thread  
 	// object constructor as 
-	std::thread thread_sending(sending_thread);
+	std::thread thread_sender(sending_thread);
 
 
 
@@ -157,7 +157,8 @@ int t3::init_client(void)
 	// object constructor as 
 	std::thread thread_receiver(receiving_thread);
 
-
+	thread_receiver.join();
+	
 
 	// shutdown the connection since no more data will be sent
 	iResult = shutdown(ConnectSocket, SD_SEND);
@@ -168,24 +169,6 @@ int t3::init_client(void)
 		char p = getchar(); //just to stop prompt from closing
 		return 1;
 	}
-
-	// Receive until the peer closes the connection
-	do {
-
-		iResult = recv(ConnectSocket, recvbuf, recvbuflen, 0);
-		if (iResult > 0) {
-			printf("Bytes received: %d\n", iResult);
-			printf("Buffer received: %s\n", recvbuf);
-			// handle message
-			handleMessage(ConnectSocket, recvbuf, recvbuflen);
-		}
-		else if (iResult == 0)
-			printf("Connection closed\n");
-		else
-			printf("recv failed with error: %d\n", WSAGetLastError());
-
-	} while (iResult > 0);
-	
 
 	// cleanup
 	closesocket(ConnectSocket);
