@@ -10,6 +10,7 @@
 #include <iostream>
 #include <string>
 #include <thread>
+#include <chrono>
 #include "t3_client.h"
 // Need to link with Ws2_32.lib
 #pragma comment (lib, "Ws2_32.lib")
@@ -103,12 +104,16 @@ int t3::init_client(void)
 		char p = getchar(); //just to stop prompt from closing
 		return 1;
 	}
+	printf("Sendbuf address %p\n", sendbuf);
 
 
 	// Define a lamda expression 
 	auto sending_thread = [ConnectSocket]() {
 		int iResult;
+		printf("Sendbuf address %p\n", sendbuf);
 		while (1) {
+			std::chrono::milliseconds timespan(16);
+			std::this_thread::sleep_for(timespan);
 			// Send an initial buffer
 			iResult = send(ConnectSocket, sendbuf, (int)sizeof(sendbuf), 0);
 			if (iResult == SOCKET_ERROR) {
@@ -137,6 +142,8 @@ int t3::init_client(void)
 		char recvbuf[DEFAULT_BUFLEN];
 		
 		do {
+			std::chrono::milliseconds timespan(16);
+			std::this_thread::sleep_for(timespan);
 			iResult = recv(ConnectSocket, recvbuf, recvbuflen, 0);
 			if (iResult > 0) {
 				printf("Bytes received: %d\n", iResult);
