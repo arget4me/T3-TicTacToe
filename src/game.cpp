@@ -285,7 +285,7 @@ bool update_game(Mouse& mouse)
 		show_winner = false;
 	}
 
-	if (mouse.left_btn.get_click())
+	if (!show_winner && mouse.left_btn.get_click())
 	{
 		float origin_x = position[0] - 1.5f * tile_size;
 		float origin_y = position[1] - 1.5f * tile_size;
