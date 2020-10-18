@@ -38,9 +38,8 @@ int t3::init_client(void)
 	//const char *sendbuf = "this is a test it is very nice";
 	//const char *sendbuf = "I like coffee";
 	
-	char recvbuf[DEFAULT_BUFLEN];
+
 	int iResult;
-	int recvbuflen = DEFAULT_BUFLEN;
 
 
 	// Validate the parameters

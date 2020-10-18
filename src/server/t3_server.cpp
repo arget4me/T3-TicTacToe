@@ -44,8 +44,6 @@ int t3::init_server(void) //Start on own thread
 	struct addrinfo hints;
 
 	int iSendResult;
-	char recvbuf[DEFAULT_BUFLEN];
-	int recvbuflen = DEFAULT_BUFLEN;
 
 
 	// Initialize Winsock
