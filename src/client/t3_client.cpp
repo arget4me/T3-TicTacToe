@@ -17,7 +17,7 @@
 // #pragma comment (lib, "Mswsock.lib")
 void handleMessage(SOCKET ConnectSocket, std::string recvbuf, int recvbuflen); // handle messages received from TCP-packets
 
-#define DEFAULT_BUFLEN 512
+#define DEFAULT_BUFLEN 3
 #define DEFAULT_PORT "27015"
 const char *serverAddress = "217.215.208.19";
 //const char *serverAddress = "127.0.0.1";
@@ -146,7 +146,7 @@ int t3::init_client(void)
 			std::this_thread::sleep_for(timespan);
 			iResult = recv(ConnectSocket, recvbuf, recvbuflen, 0);
 			if (iResult > 0) {
-				printf("Bytes received: %d\n", iResult);
+				printf("Bytes received: %d | %04X %04X %04X\n", iResult, recvbuf[0], recvbuf[1], recvbuf[2]);
 				// handle message
 				handleMessage(ConnectSocket, recvbuf, recvbuflen);
 			}

@@ -18,7 +18,7 @@
 // #pragma comment (lib, "Mswsock.lib")
 void handleMessage(SOCKET ConnectSocket, std::string recvbuf, int recvbuflen); // handle messages received from TCP-packets
 
-#define DEFAULT_BUFLEN 512
+#define DEFAULT_BUFLEN 3
 #define DEFAULT_PORT "27015"
 
 static bool active = false;
@@ -159,7 +159,7 @@ int t3::init_server(void) //Start on own thread
 				std::this_thread::sleep_for(timespan);
 				iResult = recv(ClientSocket, recvbuf, recvbuflen, 0);
 				if (iResult > 0) {
-					printf("Bytes received: %d\n", iResult);
+					printf("Bytes received: %d | %04X %04X %04X\n", iResult, recvbuf[0], recvbuf[1], recvbuf[2]);
 					// handle message
 					handleMessage(ClientSocket, recvbuf, recvbuflen);
 				}
@@ -211,8 +211,8 @@ void t3::sendData(char* data, int size)
 
 namespace t3 { void(*receive_callback)(char*, int); };
 
-void handleMessage(SOCKET ConnectSocket, std::string recvbuf, int recvbuflen) {
-
+void handleMessage(SOCKET ConnectSocket, std::string recvbuf, int recvbuflen)
+{
 	t3::receive_callback((char*)&recvbuf, recvbuflen);
 }
 
