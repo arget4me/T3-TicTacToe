@@ -27,6 +27,7 @@ static t3::ImageButton start_host_btn;
 static t3::ImageButton start_client_btn;
 static std::thread* server_thread;
 static bool select_server_client = true;
+static PlayerTurn current_player = PlayerTurn::X_PLAYER;
 
 t3GameState::t3GameState() :data_buffer {0}
 {
@@ -192,13 +193,17 @@ void btn_callback(float mx, float my)
 {
 	//select_server_client = false;
 	DEBUG_LOG("Start server\n");
+	current_player = PlayerTurn::O_PLAYER;
+	t3::sendData(global_game_state.data_buffer, global_game_state.get_buffer_size());
 	server_thread = new std::thread(t3::init_server);
+
 }
 
 void btn2_callback(float mx, float my)
 {
 	//select_server_client = false;
 	DEBUG_LOG("Start client\n");
+	current_player = PlayerTurn::X_PLAYER;
 	server_thread = new std::thread(t3::init_client);
 	
 }
@@ -277,6 +282,12 @@ bool check_win_condition_diagonal(bool top_left, TileState state)
 void update_win_condition(int tile_nr)
 {
 	TileState state = global_game_state.get_tile_state(tile_nr);
+	if (state == TileState::EMPTY_TILE || state == TileState::PADDING_TILE)
+	{
+		return;
+	}
+
+
 	int dx = tile_nr % 3;
 	int dy = tile_nr / 3;
 	bool row = check_win_condition_row(dy, state);
@@ -295,6 +306,13 @@ void update_win_condition(int tile_nr)
 
 bool update_game(Mouse& mouse)
 {
+	{
+		show_winner = false;
+		for (int i = 0; i < 9; i++)
+		{
+			update_win_condition(i);
+		}
+	}
 
 	if (select_server_client)
 	{
@@ -321,25 +339,30 @@ bool update_game(Mouse& mouse)
 			if (tile_x < 3 && tile_y < 3)
 			{
 				int tile_nr = tile_x + tile_y * 3;
-				if (global_game_state.check_place_piece_on_tile(global_game_state.get_player_turn(), tile_nr)) {
-					if (global_game_state.get_player_turn() == PlayerTurn::O_PLAYER)
-					{
-						global_game_state.set_tile_state(tile_nr, TileState::O_TILE);
-						global_game_state.set_player_turn(PlayerTurn::X_PLAYER);
-						update_win_condition(tile_nr);
-					}
-					else if (global_game_state.get_player_turn() == PlayerTurn::X_PLAYER)
-					{
-						global_game_state.set_tile_state(tile_nr, TileState::X_TILE);
-						global_game_state.set_player_turn(PlayerTurn::O_PLAYER);
-						update_win_condition(tile_nr);
+				if (current_player == global_game_state.get_player_turn())
+				{
+					if (global_game_state.check_place_piece_on_tile(global_game_state.get_player_turn(), tile_nr)) {
+						if (global_game_state.get_player_turn() == PlayerTurn::O_PLAYER)
+						{
+							global_game_state.set_tile_state(tile_nr, TileState::O_TILE);
+							global_game_state.set_player_turn(PlayerTurn::X_PLAYER);
+							update_win_condition(tile_nr);
+						}
+						else if (global_game_state.get_player_turn() == PlayerTurn::X_PLAYER)
+						{
+							global_game_state.set_tile_state(tile_nr, TileState::X_TILE);
+							global_game_state.set_player_turn(PlayerTurn::O_PLAYER);
+							update_win_condition(tile_nr);
+						}
+
+						t3::sendData(global_game_state.data_buffer, global_game_state.get_buffer_size());
 					}
 				}
 			}
 		}
 	}
 
-	t3::sendData(global_game_state.data_buffer, global_game_state.get_buffer_size());
+	
 
 	return false;
 }

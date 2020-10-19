@@ -19,17 +19,18 @@ static void handleMessage(SOCKET ConnectSocket, char* recvbuf, int recvbuflen); 
 
 #define DEFAULT_BUFLEN 3
 #define DEFAULT_PORT "27015"
-const char *serverAddress = "217.215.208.19";
-//const char *serverAddress = "127.0.0.1";
+//const char *serverAddress = "217.215.208.19";
+const char *serverAddress = "127.0.0.1";
 
 extern char sendbuf[3];
-static bool next = false;
+extern bool next;
 
 static int recvbuflen = DEFAULT_BUFLEN;
 static char recvbuf[DEFAULT_BUFLEN];
 
 int t3::init_client(void)
 {
+	next = false;
 	WSADATA wsaData;
 	SOCKET ConnectSocket = INVALID_SOCKET;
 	struct addrinfo *result = NULL,
@@ -109,12 +110,14 @@ int t3::init_client(void)
 	}
 	printf("Sendbuf address %p\n", sendbuf);
 
+	bool connection_open = true; 
+	bool* connection_open_ptr = &connection_open;
 
 	// Define a lamda expression 
-	auto sending_thread = [ConnectSocket]() {
+	auto sending_thread = [ConnectSocket, connection_open_ptr]() {
 		int iResult;
 		printf("Sendbuf address %p\n", sendbuf);
-		while (1) {
+		while (*connection_open_ptr) {
 			if (!next)continue;
 			next = false;
 			std::chrono::milliseconds timespan(16);
@@ -126,7 +129,7 @@ int t3::init_client(void)
 				closesocket(ConnectSocket);
 				WSACleanup();
 				char p = getchar(); //just to stop prompt from closing
-				return 1;
+				return;
 			}
 			printf("Bytes sent: %d | %04X %04X %04X\n", iResult, sendbuf[0], sendbuf[1], sendbuf[2]);
 		}
@@ -166,7 +169,9 @@ int t3::init_client(void)
 	// object constructor as 
 	std::thread thread_receiver(receiving_thread);
 
+	connection_open = false;
 	thread_receiver.join();
+	thread_sender.join();
 	
 
 	// shutdown the connection since no more data will be sent
@@ -182,7 +187,6 @@ int t3::init_client(void)
 	// cleanup
 	closesocket(ConnectSocket);
 	WSACleanup();
-	char p = getchar(); //just to stop prompt from closing
 
 	return 0;
 }
@@ -193,8 +197,6 @@ namespace t3 { extern void(*receive_callback)(char*, int); };
 
 static void handleMessage(SOCKET ConnectSocket, char* recvbuf, int recvbuflen) {
 	t3::receive_callback(recvbuf, recvbuflen);
-
-	next = true;
 }
 
 /*

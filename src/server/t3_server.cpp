@@ -24,7 +24,7 @@ static void handleMessage(SOCKET ConnectSocket, char* recvbuf, int recvbuflen); 
 static bool active = false;
 
 char sendbuf[3] = { 0 };
-static bool next = true;
+extern bool next = true;
 
 static int recvbuflen = DEFAULT_BUFLEN;
 static char recvbuf[DEFAULT_BUFLEN];
@@ -42,10 +42,7 @@ int t3::init_server(void) //Start on own thread
 
 	struct addrinfo *result = NULL;
 	struct addrinfo hints;
-
-	int iSendResult;
-
-
+	
 	// Initialize Winsock
 	iResult = WSAStartup(MAKEWORD(2, 2), &wsaData);
 	if (iResult != 0) {
@@ -121,12 +118,15 @@ int t3::init_server(void) //Start on own thread
 
 		printf("Sendbuf address %p\n", sendbuf);
 
+		bool connection_open = true;
+		bool* connection_open_ptr = &connection_open;
+
 		// Define a lamda expression 
-		auto sending_thread = [ClientSocket]() {
+		auto sending_thread = [ClientSocket, connection_open_ptr]() {
 			int iResult;
 
 			printf("Sendbuf address %p\n", sendbuf);
-			while (1) {
+			while (*connection_open_ptr) {
 				if (!next)continue;
 				next = false;
 				std::chrono::milliseconds timespan(16);
@@ -138,7 +138,7 @@ int t3::init_server(void) //Start on own thread
 					closesocket(ClientSocket);
 					WSACleanup();
 					char p = getchar(); //just to stop prompt from closing
-					return 1;
+					return;
 				}
 				printf("Bytes sent: %d | %04X %04X %04X\n", iResult, sendbuf[0], sendbuf[1], sendbuf[2]);
 			}
@@ -177,8 +177,9 @@ int t3::init_server(void) //Start on own thread
 		// Pass receiving_thread and its parameters to thread  
 		// object constructor as 
 		std::thread thread_receiver(receiving_thread);
-
+		connection_open = false;
 		thread_receiver.join();
+		thread_sending.join();
 
 		// shutdown the connection since we're done
 		iResult = shutdown(ClientSocket, SD_SEND);
@@ -196,7 +197,7 @@ int t3::init_server(void) //Start on own thread
 	// cleanup
 	closesocket(ClientSocket);
 	WSACleanup();
-	char p = getchar(); //just to stop prompt from closing
+	active = false;
 
 
 	return 0;
@@ -208,6 +209,7 @@ void t3::sendData(char* data, int size)
 	for (int i = 0; i < 3; i++) {
 		sendbuf[i] = data[i];
 	}
+	next = true;
 }
 
 namespace t3 { void(*receive_callback)(char*, int); };
@@ -215,7 +217,6 @@ namespace t3 { void(*receive_callback)(char*, int); };
 static void handleMessage(SOCKET ConnectSocket, char* recvbuf, int recvbuflen)
 {
 	t3::receive_callback(recvbuf, recvbuflen);
-	next = true;
 }
 
 
